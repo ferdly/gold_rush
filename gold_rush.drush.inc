@@ -42,20 +42,18 @@ function gold_rush_drush_command() {
       ),
     'options' => array(
       'context' => 'is option',
-      'orderby' => 'is option',
-      'limit' => 'is option',
-      'list' => 'is option',
-      'content_types' => 'is option',
+      'claim' => 'is option',
+      'stake' => 'is option',
       'dev' => 'is option',
     ),
   );
-  $items['developer-vardump'] = array(
+  $items['developer-vardump-gr'] = array(
     'aliases' => array(
-      'devv',
+      'devv-gr',
       ),
   );
 
-_render_help_documentation($items);
+_render_help_documentation_gr($items);
 
 return $items;
 }
@@ -78,10 +76,13 @@ return $items;
  * Callback for the drush-demo-command command
  */
 function drush_gold_rush_paydirt() {
+  $header = "Output from '" . __FUNCTION__ . "()':\r\n==========\r\n";
+  drush_print($header);
+
   $print = drush_get_option('context', 0);
   $print = $print == 1 ? TRUE : FALSE;
   $print = TRUE;
-  $context = _render_drush_context($print);
+  $context = _render_drush_context_gr($print);
   $options = $context['custom']['options'];
   unset($options['context']); //already evalauted
 
@@ -101,8 +102,8 @@ function drush_gold_rush_paydirt() {
 /**
  * Callback for the drush-demo-command command
  */
-function drush_gold_rush_developer_vardump() {
-  _do_developer_vardump();
+function drush_gold_rush_developer_vardump_gr() {
+  _do_developer_vardump_gr();
 }
 /**
  * END Drush Naming Convention Functions
@@ -111,10 +112,13 @@ function drush_gold_rush_developer_vardump() {
 /**
  * Drush Utility Functions
  * * functions here may facilitate one or more aspects
+ * * since these functions are expected to be used over and over, the ending
+ * *     "-gr" (gold rush) is added throughtout so that there aren't naming
+ * *     conflicts. Rename accordingly each time you reuse any of these functions
  *
  */
 
-function _render_help_documentation(&$items) {
+function _render_help_documentation_gr(&$items) {
 /**
   * $items Append & Overload below
   * description ONLY here
@@ -122,11 +126,19 @@ function _render_help_documentation(&$items) {
   * aliases isn't associative so NEVER here
   * others fleshed out for HELP command
   */
+$items['paydirt']['description'] = "'paydirt' is a purposely inert command that merely renders Drush 'Context'. (see option 'context' below)";
+
+$items['developer-vardump-gr']['description'] = "'developer-vardump-gr' is a very useful command that can be used to, well, dump variables while developing other commands. Three simple examples are included, adjust them by commenting and uncommenting for the effect you like, or append your own.";
+
+$items['paydirt']['options']['context'] = 'Render Drush \'Context\' data, both core [\'drush\'] data, and [\'custom\'] that expresses useful data about the particular command as immediately called. NOTE: this option is often a default at first.';
+$items['paydirt']['options']['dev'] = "A useful convention that extends any output beyond what a normal user may expect to include various developer output. NOTE: this option is mostly used during testing phase and probably should be removed before deployment.";
+
+$items['node-tablelist']['examples']['drush paydirt --context'] = 'Render Drush \'Context\' data, both core [\'drush\'] data, and [\'custom\'] that expresses useful data about the particular command. NOTE: this option is often a default at first.';
 
 
-  _render_help_documentation_default($items);
+  _render_help_documentation_gr_default($items);
 }
-function _render_help_documentation_default(&$items) {
+function _render_help_documentation_gr_default(&$items) {
   foreach ($items as $command => $command_attributes) {
     if (empty($command_attributes['description'])) {
       $items[$command]['description'] = "Description for the drush command '{$command}'.";
@@ -154,7 +166,8 @@ function _render_help_documentation_default(&$items) {
   }
 }
 
-function _render_drush_context($print = FALSE) {
+function _render_drush_context_gr($print = FALSE) {
+  $file_line = '[File: ' . basename(__FILE__) . '; Line: ' . __LINE . ';]';
   $print = $print !== TRUE ? FALSE : TRUE;
 
   $context = drush_get_context();
@@ -203,7 +216,8 @@ function _render_drush_context($print = FALSE) {
   $developer_friedly_array['drush'] = $dfa_drush;
   $developer_friedly_array['custom'] = $dfa_custom;
   if ($print) {
-    $header = "Output from '" . __FUNCTION__ . "()':\r\n======================================\r\n";
+
+    $header = "Output from '" . __FUNCTION__ . "()':\r\n" . $file_line . "\r\n======================================\r\n";
     $output = print_r($developer_friedly_array, TRUE);
     drush_print($header . $output);
   }
@@ -228,7 +242,8 @@ function _render_drush_context($print = FALSE) {
  */
 
 function _do_paydirt($options_array = array()) {
-    drush_print(print_r($options_array, TRUE));
+  // $header = "Output from '" . __FUNCTION__ . "()':\r\n==========\r\n";
+  // drush_print(print_r($options_array, TRUE));
 }
 
 // function _do_convert_fahrenheit_to_celcius($degrees_fahrenheit) {
@@ -242,28 +257,28 @@ function _do_paydirt($options_array = array()) {
 //   drush_print($degrees_to_celcius_string);
 // }
 
-function _do_developer_vardump() {
+function _do_developer_vardump_gr() {
   $header = "Output from '" . __FUNCTION__ . "()':\r\n==========\r\n";
+
   $output = 'Hello World!';
   drush_print($header . $output);
   return;
 
-  // $thing_array = array();
-  // $i = -1;
-  // $i++;
-  // $thing[$i]['thing'] = 'Corvette';
-  // $thing[$i]['type'] = 'Little';
-  // $thing[$i]['color'] = 'Red';
-  // $i++;
-  // $thing[$i]['thing'] = 'Meanies';
-  // $thing[$i]['type'] = 'Screaming';
-  // $thing[$i]['color'] = 'Blue';
-  // $i++;
-  // $thing[$i]['thing'] = 'Fox';
-  // $thing[$i]['type'] = 'Quick';
-  // $thing[$i]['color'] = 'Brown';
-  // $output = print_r($thing, TRUE);
-
+  $thing_array = array();
+  $i = -1;
+  $i++;
+  $thing[$i]['thing'] = 'Corvette';
+  $thing[$i]['type'] = 'Little';
+  $thing[$i]['color'] = 'Red';
+  $i++;
+  $thing[$i]['thing'] = 'Meanies';
+  $thing[$i]['type'] = 'Screaming';
+  $thing[$i]['color'] = 'Blue';
+  $i++;
+  $thing[$i]['thing'] = 'Fox';
+  $thing[$i]['type'] = 'Quick';
+  $thing[$i]['color'] = 'Brown';
+  $output = print_r($thing, TRUE);
   drush_print($header . $output);
   return;
 

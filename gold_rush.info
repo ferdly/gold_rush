@@ -1,0 +1,12 @@
+name = Gold Rush
+description = An Example Module to illustrate how to code Drush Commands. aka Goal-Drush
+; considered 'Goal-Drush', but the word 'drush' in functions via naming conventions
+; would certainly add confusion to what should be straight forward
+
+package = QIQgroup Tools
+core = 7.x
+files[] = gold_rush.module
+
+
+
+; Additional Notes

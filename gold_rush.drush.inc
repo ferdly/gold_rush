@@ -40,6 +40,9 @@ function gold_rush_drush_command() {
       'pd',
       'payd',
       ),
+    'arguments' => array(
+      'area' => 'is argument',
+    ),
     'options' => array(
       'context' => 'is option',
       'claim' => 'is option',
@@ -76,25 +79,46 @@ return $items;
  * Callback for the drush-demo-command command
  */
 function drush_gold_rush_paydirt() {
-  $header = "Output from '" . __FUNCTION__ . "()':\r\n==========\r\n";
-  drush_print($header);
-
   $print = drush_get_option('context', 0);
   $print = $print == 1 ? TRUE : FALSE;
-  $print = TRUE;
+  // $print = TRUE;
   $context = _render_drush_context_gr($print);
+  $argument_count = count($context['drush']['arguments']);
+  $area = strtolower($context['custom']['arguments']['area']);
+  $area = $area == 'missing_argument' ? '' : $area;
   $options = $context['custom']['options'];
+  $option_array = array();
+  foreach ($options as $key => $value) {
+    if ($value != 'not_provided') {
+      $option_array[$key] = $value;
+    }
+  }
   unset($options['context']); //already evalauted
 
   /*<Validation Here>*/
+  if ($argument_count > 1) {
+    return drush_set_error(dt('"@argument_count" is not a valid number of Arguments[1 is expected]. ',
+          array('@argument_count' => $argument_count)));
+  }
+  $supported_area_array = array(
+    'california' => '1849 California Gold Rush',
+    'klondike' => '1896 Klondike Gold Rush',
+    );
+  $supported_area_value_array = array_keys($supported_area_array);
+  if (empty($area)) {
+    $area = drush_choice($supported_area_array, dt('Which Example would you like to interact with using \'PHP-Coder\'?'));
 
+  }
+  if (!in_array($area, $supported_area_value_array)) {
+    return drush_set_error(dt('"@area" is not a supported Area. ',
+          array('@area' => $area)));
+  }
   /*</Validation Here>*/
-  $option_array['limit'] = $limit;
-  $option_array['list'] = $list;
-  $option_array['content_types'] = $content_type_after;
-  $option_array['orderby'] = $orderby;
-  $option_array['dev'] = $dev;
-  _do_paydirt($option_array);
+
+  $header = "Output from '" . __FUNCTION__ . "({$area})':\r\n==========\r\n";
+  drush_print($header);
+
+  _do_paydirt($area, $option_array);
   return;
 } //END function drush_paydirt($which_list = FALSE)
 
@@ -167,7 +191,7 @@ function _render_help_documentation_gr_default(&$items) {
 }
 
 function _render_drush_context_gr($print = FALSE) {
-  $file_line = '[File: ' . basename(__FILE__) . '; Line: ' . __LINE . ';]';
+  $file_line = '[File: ' . basename(__FILE__) . '; Line: ' . __LINE__ . ';]';
   $print = $print !== TRUE ? FALSE : TRUE;
 
   $context = drush_get_context();
@@ -241,9 +265,11 @@ function _render_drush_context_gr($print = FALSE) {
  * Example function.
  */
 
-function _do_paydirt($options_array = array()) {
-  // $header = "Output from '" . __FUNCTION__ . "()':\r\n==========\r\n";
-  // drush_print(print_r($options_array, TRUE));
+function _do_paydirt($area, $options_array = array()) {
+  // $header = "Output from '" . __FUNCTION__ . "({$area})':\r\n==========\r\n";
+  $area_element = array('area' => $area);
+  array_push($options_array, $area_element);
+  drush_print(print_r($options_array, TRUE));
 }
 
 // function _do_convert_fahrenheit_to_celcius($degrees_fahrenheit) {

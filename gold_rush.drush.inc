@@ -84,7 +84,7 @@ function drush_gold_rush_paydirt() {
   // $print = TRUE;
   $context = _render_drush_context_gr($print);
   $argument_count = count($context['drush']['arguments']);
-  $area = strtolower($context['custom']['arguments']['area']);
+  $area = strtoupper($context['custom']['arguments']['area']);
   $area = $area == 'missing_argument' ? '' : $area;
   $options = $context['custom']['options'];
   $option_array = array();
@@ -101,8 +101,8 @@ function drush_gold_rush_paydirt() {
           array('@argument_count' => $argument_count)));
   }
   $supported_area_array = array(
-    'california' => '1849 California Gold Rush',
-    'klondike' => '1896 Klondike Gold Rush',
+    'CALIFORNIA' => '1849 California Gold Rush',
+    'KLONDIKE' => '1896 Klondike Gold Rush',
     );
   $supported_area_value_array = array_keys($supported_area_array);
   if (empty($area)) {
@@ -115,7 +115,7 @@ function drush_gold_rush_paydirt() {
   }
   /*</Validation Here>*/
 
-  $header = "Output from '" . __FUNCTION__ . "({$area})':\r\n==========\r\n";
+  $header = "Output from '" . __FUNCTION__ . "({$area})':\r\n========================================" . substr('==========', (-1 * strlen($area))) . "\r\n";
   drush_print($header);
 
   _do_paydirt($area, $option_array);

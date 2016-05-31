@@ -85,7 +85,7 @@ function drush_gold_rush_paydirt() {
   $context = _render_drush_context_gr($print);
   $argument_count = count($context['drush']['arguments']);
   $area = strtoupper($context['custom']['arguments']['area']);
-  $area = $area == 'missing_argument' ? '' : $area;
+  $area = $area == 'MISSING_ARGUMENT' ? '' : $area;
   $options = $context['custom']['options'];
   $option_array = array();
   foreach ($options as $key => $value) {
@@ -107,15 +107,28 @@ function drush_gold_rush_paydirt() {
   $supported_area_value_array = array_keys($supported_area_array);
   if (empty($area)) {
     $area = drush_choice($supported_area_array, dt('Which Example would you like to interact with using \'PHP-Coder\'?'));
-
   }
+  if ($area == '0') {
+    $output_message = 'Update this Cancel Message. [Function: ' . __FUNCTION__ . '; Line: ' . __LINE__ . ';]' . "\r\n\r\n";
+    drush_user_abort($output_message);
+    return;
+  }
+
   if (!in_array($area, $supported_area_value_array)) {
     return drush_set_error(dt('"@area" is not a supported Area. ',
           array('@area' => $area)));
   }
   /*</Validation Here>*/
 
-  $header = "Output from '" . __FUNCTION__ . "({$area})':\r\n========================================" . substr('==========', (-1 * strlen($area))) . "\r\n";
+  $header = "Output from '" . __FUNCTION__ . "({$area})':";
+  $count = strlen($header);
+  $header .= "\r\n";
+  $i = 0;
+  while ( $i < $count) {
+    $header .= '=';
+    $i++;
+  }
+  $header .= "\r\n";
   drush_print($header);
 
   _do_paydirt($area, $option_array);
@@ -265,11 +278,16 @@ function _render_drush_context_gr($print = FALSE) {
  * Example function.
  */
 
-function _do_paydirt($area, $options_array = array()) {
+function _do_paydirt($area, $option_array = array()) {
   // $header = "Output from '" . __FUNCTION__ . "({$area})':\r\n==========\r\n";
-  $area_element = array('area' => $area);
-  array_push($options_array, $area_element);
-  drush_print(print_r($options_array, TRUE));
+  // $area_element = array('area' => $area);
+  if ($option_array['dev']) {
+    $output_array['area'] = $area;
+    $output_array['options'] = $option_array;
+    drush_print(print_r($output_array, TRUE));
+  }
+  $output_message = 'Update this Output Message. [Function: ' . __FUNCTION__ . '; Line: ' . __LINE__ . ';]' . "\r\n\r\n";
+  drush_print($output_message);
 }
 
 // function _do_convert_fahrenheit_to_celcius($degrees_fahrenheit) {

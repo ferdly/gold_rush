@@ -33,7 +33,7 @@
  */
 function gold_rush_drush_command() {
 /**
- *
+ * only minimaml required for drush to work
  */
   $items['paydirt'] = array(
     'aliases' => array(
@@ -50,13 +50,13 @@ function gold_rush_drush_command() {
       'dev' => 'is option',
     ),
   );
-  $items['developer-vardump-gr'] = array(
+  $items['developer-vardump-gold-rush'] = array(
     'aliases' => array(
       'devv-gr',
       ),
   );
 
-_render_help_documentation_gr($items);
+_render_help_documentation_gold_rush($items);
 
 return $items;
 }
@@ -82,7 +82,7 @@ function drush_gold_rush_paydirt() {
   $print = drush_get_option('context', 0);
   $print = $print == 1 ? TRUE : FALSE;
   // $print = TRUE;
-  $context = _render_drush_context_gr($print);
+  $context = _render_drush_context_gold_rush($print);
   $argument_count = count($context['drush']['arguments']);
   $area = strtoupper($context['custom']['arguments']['area']);
   $area = $area == 'MISSING_ARGUMENT' ? '' : $area;
@@ -119,17 +119,15 @@ function drush_gold_rush_paydirt() {
           array('@area' => $area)));
   }
   /*</Validation Here>*/
-
-  $header = "Output from '" . __FUNCTION__ . "({$area})':";
-  $count = strlen($header);
-  $header .= "\r\n";
-  $i = 0;
-  while ( $i < $count) {
-    $header .= '=';
-    $i++;
+  $parameter_array = $option_array;
+  foreach ($variable as $key => $value) {
+    # code...
   }
-  $header .= "\r\n";
-  drush_print($header);
+  array_unshift($parameter_array, $area);
+  $header = _render_header_gold_rush(__FUNCTION__, implode(',', $parameter_array));
+  // $header = _render_header_gold_rush(__FUNCTION__, $area);
+
+  drush_print($header . print_r($option_array, TRUE));
 
   _do_paydirt($area, $option_array);
   return;
@@ -139,8 +137,8 @@ function drush_gold_rush_paydirt() {
 /**
  * Callback for the drush-demo-command command
  */
-function drush_gold_rush_developer_vardump_gr() {
-  _do_developer_vardump_gr();
+function drush_gold_rush_developer_vardump_gold_rush() {
+  _do_developer_vardump_gold_rush();
 }
 /**
  * END Drush Naming Convention Functions
@@ -150,12 +148,14 @@ function drush_gold_rush_developer_vardump_gr() {
  * Drush Utility Functions
  * * functions here may facilitate one or more aspects
  * * since these functions are expected to be used over and over, the ending
- * *     "-gr" (gold rush) is added throughtout so that there aren't naming
- * *     conflicts. Rename accordingly each time you reuse any of these functions
+ * *     "_gold_rush" is added throughtout so that there aren't naming
+ * *     conflicts when this code is duplicated.
+ * *     Rename accordingly each time you reuse any of these functions, but don't
+ * *     freak-out if you get "PHP Fatal error:  Cannot redeclare {FunctionName}",
+ * *     that just means you duplicated and forgot to rename.
  *
  */
-
-function _render_help_documentation_gr(&$items) {
+function _render_help_documentation_gold_rush(&$items) {
 /**
   * $items Append & Overload below
   * description ONLY here
@@ -173,9 +173,10 @@ $items['paydirt']['options']['dev'] = "A useful convention that extends any outp
 $items['node-tablelist']['examples']['drush paydirt --context'] = 'Render Drush \'Context\' data, both core [\'drush\'] data, and [\'custom\'] that expresses useful data about the particular command. NOTE: this option is often a default at first.';
 
 
-  _render_help_documentation_gr_default($items);
+  _render_help_documentation_gold_rush_default($items);
 }
-function _render_help_documentation_gr_default(&$items) {
+
+function _render_help_documentation_gold_rush_default(&$items) {
   foreach ($items as $command => $command_attributes) {
     if (empty($command_attributes['description'])) {
       $items[$command]['description'] = "Description for the drush command '{$command}'.";
@@ -202,8 +203,22 @@ function _render_help_documentation_gr_default(&$items) {
     }
   }
 }
+function _render_header_gold_rush($function, $parameter_string = '', $line = 0) {
+  $file_line = '[File: ' . basename(__FILE__) . '; Line: ' . $line . ';]' . "\r\n";
+  $file_line = $line > 0 ? $file_line : '';
+  $header = 'Result of ' . $function . '(' . $parameter_string . ")";
+  // $header = 'Output from ' . $function . '(' . $parameter_string . ")"; //ALT
+  $header_length = strlen($header);
+  $underscore = '';
+  $i = 0;
+  while ($i < $header_length) {
+    $underscore .= '=';
+    $i++;
+  }
+  return $header . "\r\n" . $underscore . "\r\n" . $file_line;
+}
 
-function _render_drush_context_gr($print = FALSE) {
+function _render_drush_context_gold_rush($print = FALSE) {
   $file_line = '[File: ' . basename(__FILE__) . '; Line: ' . __LINE__ . ';]';
   $print = $print !== TRUE ? FALSE : TRUE;
 
@@ -279,7 +294,8 @@ function _render_drush_context_gr($print = FALSE) {
  */
 
 function _do_paydirt($area, $option_array = array()) {
-  // $header = "Output from '" . __FUNCTION__ . "({$area})':\r\n==========\r\n";
+  // $header = _render_header_gold_rush(__FUNCTION__, implode(',', $option_array));
+  $header = "Output from '" . __FUNCTION__ . "({$area})':\r\n==========\r\n";
   // $area_element = array('area' => $area);
   if ($option_array['dev']) {
     $output_array['area'] = $area;
@@ -301,8 +317,10 @@ function _do_paydirt($area, $option_array = array()) {
 //   drush_print($degrees_to_celcius_string);
 // }
 
-function _do_developer_vardump_gr() {
-  $header = "Output from '" . __FUNCTION__ . "()':\r\n==========\r\n";
+function _do_developer_vardump_gold_rush() {
+  // $header = "Output from '" . __FUNCTION__ . "()':\r\n==========\r\n";
+  $z = '';
+  $header = _render_header_gold_rush(__FUNCTION__);
 
   $output = 'Hello World!';
   drush_print($header . $output);
